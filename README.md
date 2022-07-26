@@ -1,5 +1,5 @@
 # ocp-preview
-Script to build and deploy openshift docs to a file server 
+Script to build and deploy openshift docs to a file server.
 
 ```
 Usage: ocp-preview [OPTION] [DISTRO]
