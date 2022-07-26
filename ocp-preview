@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+#version 0.4
+
+set -e
+
+if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+  echo "ERROR: you must execute this script from the OpenShift Git repository." 1>&2
+  exit 1
+fi
+
+REPO_PATH="$HOME/openshift-docs"
+USER="$(git config -f ~/.ocp-preview user.name)"
+FILE_SERVER="$(git config -f ~/.ocp-preview server.name)"
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+
+cd $REPO_PATH
+
+distro=$2
+
+if [[ -z "$distro" ]]; then
+    distro="-d openshift-enterprise"
+    DISTRO="openshift-enterprise"
+  elif [[ "$2" = "all" ]]; then
+    echo "Building all distros..."
+    distro=""
+  else
+   echo "Building $2 distro..."
+   distro="-d $2"
+   DISTRO="$2"
+fi
+
+function full_build {
+  asciibinder build $distro; echo "Running rsync..."; rsync_full; echo "...rsync run complete!"
+
+  xdg-open >/dev/null 2>&1 http://$FILE_SERVER/$USER/$CURRENT_BRANCH/welcome/index.html
+}
+
+function refresh_build {
+  PAGES=$(git diff-tree HEAD HEAD~1 --no-commit-id --name-only -r | awk '!/modules\/(.*)\.adoc/' | awk '/(.*)\.adoc/' | cut -f 1 -d '.')
+
+  for LINE in $PAGES
+    do asciibinder clean; asciibinder build --page=$LINE; echo "Running rsync for $LINE..."; rsync_refresh; echo "...rsync run complete!"
+  done
+
+  xdg-open >/dev/null 2>&1 http://$FILE_SERVER/$USER/$CURRENT_BRANCH/welcome/index.html
+}
+
+function rsync_full {
+  rsync -auzq --rsync-path="mkdir -p ~/public_html/$CURRENT_BRANCH && rsync" --progress _preview/$DISTRO/$CURRENT_BRANCH/* $USER@$FILE_SERVER:~/public_html/$CURRENT_BRANCH
+}
+
+function rsync_refresh {
+  rsync -auzq --rsync-path="mkdir -p ~/public_html/$CURRENT_BRANCH && rsync" --progress _preview/$DISTRO/$CURRENT_BRANCH/* $USER@$FILE_SERVER:~/public_html/$CURRENT_BRANCH
+}
+
+function build_rsync_refresh_silent {
+  PAGES=$(git diff-tree HEAD HEAD~1 --no-commit-id --name-only -r | awk '!/modules\/(.*)\.adoc/' | awk '/(.*)\.adoc/' | cut -f 1 -d '.')
+
+  for LINE in $PAGES
+    do asciibinder clean; asciibinder build --page=$LINE; echo "Running rsync for $LINE..."
+  done
+
+  rsync_refresh
+
+  echo "...rsync run complete!"
+}
+
+function local_full_build {
+  asciibinder clean; asciibinder build $distro
+
+  xdg-open >/dev/null 2>&1 $REPO_PATH/_preview/$DISTRO/$CURRENT_BRANCH/welcome/index.html
+}
+
+function local_refresh_build {
+  PAGES=$(git diff-tree HEAD HEAD~1 --no-commit-id --name-only -r | awk '!/modules\/(.*)\.adoc/' | awk '/(.*)\.adoc/' | cut -f 1 -d '.')
+
+  for LINE in $PAGES
+    do asciibinder build --page=$LINE
+    xdg-open >/dev/null 2>&1 $REPO_PATH/_preview/$DISTRO/$CURRENT_BRANCH/$LINE.html
+  done
+}
+
+function local_refresh_silent {
+  PAGES=$(git diff-tree HEAD HEAD~1 --no-commit-id --name-only -r | awk '!/modules\/(.*)\.adoc/' | awk '/(.*)\.adoc/' | cut -f 1 -d '.')
+
+  for LINE in $PAGES
+    do asciibinder build --page=$LINE
+  done
+}
+
+function delete_build {
+  ssh $USER@$FILE_SERVER 'rm -rf ~/public_html/$CURRENT_BRANCH'
+  echo 'Deleted the' $CURRENT_BRANCH 'build from' $FILE_SERVER'.'
+}
+
+function show_help {
+  echo "Usage: ocp-preview [OPTION] [DISTRO]"
+  echo "Usage: [DISTRO] is optional, build default is openshift-enterprise. Specify 'all' to build all distros."
+  echo "-b, --build"
+  echo "               does a full clean build and rsync. Use this option if your PR does not update an assembly."
+  echo "-r, --refresh"
+  echo "               builds and rsyncs updated assemblies only. Uses default distro."
+  echo "-s, --silent-refresh"
+  echo "               builds and rsyncs updated assemblies, no preview pop up. Uses default distro."
+  echo "-l, --local-build"
+  echo "               does a full clean build locally, does not rsync. Use this option if your PR does not update an assembly."
+  echo "-f, --local-refresh"
+  echo "               builds and updated assemblies locally, does not rsync. Uses default distro."
+  echo "-c, --local-refresh-silent"
+  echo "               builds and updated assemblies locally, does not rsync, no preview pop up. Uses default distro."
+  echo "-d, --delete"
+  echo "               deletes the current pull request build from the file server."
+}
+
+if [ "$1" = "--build" -o "$1" = "-b" ]; then
+  full_build
+elif [ "$1" = "--refresh" -o "$1" = "-r" ]; then
+  refresh_build
+elif [ "$1" = "--local-build" -o "$1" = "-l" ]; then
+  local_full_build
+elif [ "$1" = "--local-refresh" -o "$1" = "-f" ]; then
+  local_refresh_build
+elif [ "$1" = "--silent" -o "$1" = "-s" ]; then
+  build_rsync_refresh_silent
+elif [ "$1" = "--local-refresh-silent" -o "$1" = "-c" ]; then
+  local_refresh_silent
+elif [ "$1" = "--delete" -o "$1" = "-d" ]; then
+  delete_build
+elif [ "$1" = "--help" -o "$1" = "-h" ]; then
+  show_help 
+elif [[ ! $@ =~ ^\-.+ ]]; then
+  show_help
+else
+  break
+fi

@@ -1,5 +1,23 @@
 # ocp-preview
+
 Script to build and deploy openshift docs to a file server.
+
+To install: 
+
+* Copy `ocp-preview` script to `/usr/local/bin`
+* `chmod a+x /usr/local/bin/ocp-preview`
+* `touch ~/.ocp-preview`
+* `vi ~/.ocp-preview` and add the following:
+
+```
+[user]
+    name = REPLACE_WITH_USERNAME
+[server]
+    name = REPLACE_WITH_FILESERVER
+```
+
+
+Using the ocp-preview script:
 
 ```
 Usage: ocp-preview [OPTION] [DISTRO]
