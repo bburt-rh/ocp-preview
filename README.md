@@ -14,6 +14,8 @@ To install:
     name = <REPLACE_WITH_USERNAME>
 [server]
     name = <REPLACE_WITH_FILESERVER>
+[repo]
+    name = <REPLACE_WITH_DOCS_REPO_PATH>
 ```
 
 
