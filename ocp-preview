@@ -8,7 +8,7 @@ if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
   exit 1
 fi
 
-REPO_PATH="$HOME/openshift-docs"
+REPO_PATH="$(git config -f ~/.ocp-preview repo.name)"
 USER="$(git config -f ~/.ocp-preview user.name)"
 FILE_SERVER="$(git config -f ~/.ocp-preview server.name)"
 CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
