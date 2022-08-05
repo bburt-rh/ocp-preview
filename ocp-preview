@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#version 0.4
+#version 0.5
 
 set -e
 
@@ -12,6 +12,7 @@ REPO_PATH="$HOME/openshift-docs"
 USER="$(git config -f ~/.ocp-preview user.name)"
 FILE_SERVER="$(git config -f ~/.ocp-preview server.name)"
 CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+PAGES=$(git diff-tree HEAD HEAD~1 --no-commit-id --name-only -r | awk '!/modules\/(.*)\.adoc/' | awk '/(.*)\.adoc/' | cut -f 1 -d '.')
 
 cd $REPO_PATH
 
@@ -30,61 +31,47 @@ if [[ -z "$distro" ]]; then
 fi
 
 function full_build {
-  asciibinder build $distro; echo "Running rsync..."; rsync_full; echo "...rsync run complete!"
+  asciibinder build $distro; echo "Running rsync..."; rsync_build; echo "...rsync run complete!"
 
   xdg-open >/dev/null 2>&1 http://$FILE_SERVER/$USER/$CURRENT_BRANCH/welcome/index.html
 }
 
 function refresh_build {
-  PAGES=$(git diff-tree HEAD HEAD~1 --no-commit-id --name-only -r | awk '!/modules\/(.*)\.adoc/' | awk '/(.*)\.adoc/' | cut -f 1 -d '.')
-
-  for LINE in $PAGES
-    do asciibinder clean; asciibinder build --page=$LINE; echo "Running rsync for $LINE..."; rsync_refresh; echo "...rsync run complete!"
+  for PAGE in $PAGES
+    do asciibinder clean; asciibinder build --page=$PAGE; echo "Running rsync for $PAGE..."; rsync_build; echo "...rsync run complete!"
+    xdg-open >/dev/null 2>&1 http://$FILE_SERVER/$USER/$CURRENT_BRANCH/$PAGE.html 
   done
-
-  xdg-open >/dev/null 2>&1 http://$FILE_SERVER/$USER/$CURRENT_BRANCH/welcome/index.html
 }
 
-function rsync_full {
+function rsync_build {
   rsync -auzq --rsync-path="mkdir -p ~/public_html/$CURRENT_BRANCH && rsync" --progress _preview/$DISTRO/$CURRENT_BRANCH/* $USER@$FILE_SERVER:~/public_html/$CURRENT_BRANCH
 }
 
-function rsync_refresh {
-  rsync -auzq --rsync-path="mkdir -p ~/public_html/$CURRENT_BRANCH && rsync" --progress _preview/$DISTRO/$CURRENT_BRANCH/* $USER@$FILE_SERVER:~/public_html/$CURRENT_BRANCH
-}
-
-function build_rsync_refresh_silent {
-  PAGES=$(git diff-tree HEAD HEAD~1 --no-commit-id --name-only -r | awk '!/modules\/(.*)\.adoc/' | awk '/(.*)\.adoc/' | cut -f 1 -d '.')
-
-  for LINE in $PAGES
-    do asciibinder clean; asciibinder build --page=$LINE; echo "Running rsync for $LINE..."
+function build_rsync_silent {
+  for PAGE in $PAGES
+    do asciibinder clean; asciibinder build --page=$PAGE; echo "Running rsync for $PAGE..."
   done
 
-  rsync_refresh
+  rsync_build
 
   echo "...rsync run complete!"
 }
 
 function local_full_build {
   asciibinder clean; asciibinder build $distro
-
   xdg-open >/dev/null 2>&1 $REPO_PATH/_preview/$DISTRO/$CURRENT_BRANCH/welcome/index.html
 }
 
 function local_refresh_build {
-  PAGES=$(git diff-tree HEAD HEAD~1 --no-commit-id --name-only -r | awk '!/modules\/(.*)\.adoc/' | awk '/(.*)\.adoc/' | cut -f 1 -d '.')
-
-  for LINE in $PAGES
-    do asciibinder build --page=$LINE
-    xdg-open >/dev/null 2>&1 $REPO_PATH/_preview/$DISTRO/$CURRENT_BRANCH/$LINE.html
+  for PAGE in $PAGES
+    do asciibinder build --page=$PAGE
+    xdg-open >/dev/null 2>&1 $REPO_PATH/_preview/$DISTRO/$CURRENT_BRANCH/$PAGE.html
   done
 }
 
 function local_refresh_silent {
-  PAGES=$(git diff-tree HEAD HEAD~1 --no-commit-id --name-only -r | awk '!/modules\/(.*)\.adoc/' | awk '/(.*)\.adoc/' | cut -f 1 -d '.')
-
-  for LINE in $PAGES
-    do asciibinder build --page=$LINE
+  for PAGE in $PAGES
+    do asciibinder build --page=$PAGE
   done
 }
 
@@ -121,7 +108,7 @@ elif [ "$1" = "--local-build" -o "$1" = "-l" ]; then
 elif [ "$1" = "--local-refresh" -o "$1" = "-f" ]; then
   local_refresh_build
 elif [ "$1" = "--silent" -o "$1" = "-s" ]; then
-  build_rsync_refresh_silent
+  build_rsync_silent
 elif [ "$1" = "--local-refresh-silent" -o "$1" = "-c" ]; then
   local_refresh_silent
 elif [ "$1" = "--delete" -o "$1" = "-d" ]; then
