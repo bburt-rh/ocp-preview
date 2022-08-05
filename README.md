@@ -11,9 +11,9 @@ To install:
 
 ```
 [user]
-    name = REPLACE_WITH_USERNAME
+    name = <REPLACE_WITH_USERNAME>
 [server]
-    name = REPLACE_WITH_FILESERVER
+    name = <REPLACE_WITH_FILESERVER>
 ```
 
 
