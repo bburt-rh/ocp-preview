@@ -6,8 +6,7 @@ To install:
 
 * Copy `ocp-preview` script to `/usr/local/bin`
 * `chmod a+x /usr/local/bin/ocp-preview`
-* `touch ~/.ocp-preview`
-* `vi ~/.ocp-preview` and add the following:
+* Create a config file: `vi ~/.ocp-preview` and add the following:
 
 ```
 [user]
