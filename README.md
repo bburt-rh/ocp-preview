@@ -6,17 +6,8 @@ To install:
 
 * Copy `ocp-preview` script to `/usr/local/bin`
 * `chmod a+x /usr/local/bin/ocp-preview`
-* Create a config file: `vi ~/.ocp-preview` and add the following:
+* Create a config file: `vi ~/.ocp-preview` and update with your config details, for example:
 
-```
-[user]
-    name = <REPLACE_WITH_USERNAME>
-[server]
-    name = <REPLACE_WITH_FILESERVER>
-[repo]
-    name = <REPLACE_WITH_DOCS_REPO_PATH>
-```
-For example:
 ```
 [user]
     name = aireilly
