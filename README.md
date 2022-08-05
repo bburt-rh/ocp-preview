@@ -17,7 +17,15 @@ To install:
 [repo]
     name = <REPLACE_WITH_DOCS_REPO_PATH>
 ```
-
+For example:
+```
+[user]
+    name = aireilly
+[server]
+    name = file.emea.redhat.com
+[repo]
+    name = /home/aireilly/openshift-docs
+```
 
 Using the ocp-preview script:
 
