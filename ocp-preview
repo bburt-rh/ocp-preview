@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#version 0.6
+#version 0.7
 
 set -e
 
@@ -34,6 +34,7 @@ function full_build {
   asciibinder build $distro; echo "Running rsync..."; rsync_build; echo "...rsync run complete!"
 
   xdg-open >/dev/null 2>&1 http://$FILE_SERVER/$USER/$CURRENT_BRANCH/welcome/index.html
+  echo "Check the docs at: http://$FILE_SERVER/$USER/$CURRENT_BRANCH/welcome/index.html"
 }
 
 function refresh_build {
@@ -43,6 +44,7 @@ function refresh_build {
     for PAGE in $PAGES
       do asciibinder build --page=$PAGE; echo "Running rsync for $PAGE..."; rsync_build; echo "...rsync run complete!"
       xdg-open >/dev/null 2>&1 http://$FILE_SERVER/$USER/$CURRENT_BRANCH/$PAGE.html 
+      echo "Check the docs at: http://$FILE_SERVER/$USER/$CURRENT_BRANCH/$PAGE.html"
     done
   fi
 }
@@ -66,6 +68,7 @@ function build_rsync_silent {
 function local_full_build {
   asciibinder clean; asciibinder build $distro
   xdg-open >/dev/null 2>&1 $REPO_PATH/_preview/$DISTRO/$CURRENT_BRANCH/welcome/index.html
+  echo "Check the docs at: $REPO_PATH/_preview/$DISTRO/$CURRENT_BRANCH/welcome/index.html"
 }
 
 function local_refresh_build {
@@ -75,6 +78,7 @@ function local_refresh_build {
     for PAGE in $PAGES
       do asciibinder build --page=$PAGE
       xdg-open >/dev/null 2>&1 $REPO_PATH/_preview/$DISTRO/$CURRENT_BRANCH/$PAGE.html
+      echo "Check the docs at: $REPO_PATH/_preview/$DISTRO/$CURRENT_BRANCH/welcome/index.html"
     done
   fi
 }
@@ -86,6 +90,7 @@ function local_refresh_silent {
     for PAGE in $PAGES
       do asciibinder build --page=$PAGE
     done
+    echo "Check the docs at: $REPO_PATH/_preview/$DISTRO/$CURRENT_BRANCH/welcome/index.html"
   fi
 }
 
