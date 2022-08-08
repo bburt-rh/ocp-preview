@@ -38,7 +38,7 @@ function full_build {
 
 function refresh_build {
   for PAGE in $PAGES
-    do asciibinder clean; asciibinder build --page=$PAGE; echo "Running rsync for $PAGE..."; rsync_build; echo "...rsync run complete!"
+    do asciibinder build --page=$PAGE; echo "Running rsync for $PAGE..."; rsync_build; echo "...rsync run complete!"
     xdg-open >/dev/null 2>&1 http://$FILE_SERVER/$USER/$CURRENT_BRANCH/$PAGE.html 
   done
 }
