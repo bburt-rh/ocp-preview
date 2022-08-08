@@ -49,7 +49,7 @@ function rsync_build {
 
 function build_rsync_silent {
   for PAGE in $PAGES
-    do asciibinder clean; asciibinder build --page=$PAGE; echo "Running rsync for $PAGE..."
+    do asciibinder build --page=$PAGE; echo "Running rsync for $PAGE..."
   done
 
   rsync_build
