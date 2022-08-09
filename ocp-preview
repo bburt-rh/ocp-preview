@@ -59,9 +59,8 @@ function build_rsync_silent {
       do asciibinder clean; asciibinder build --page=$PAGE; echo "Running rsync for $PAGE..."
     done
     rsync_build
+    echo "...rsync run complete!"
   fi
-
-  echo "...rsync run complete!"
 }
 
 function local_full_build {
@@ -81,9 +80,13 @@ function local_refresh_build {
 }
 
 function local_refresh_silent {
-  for PAGE in $PAGES
-    do asciibinder build --page=$PAGE
-  done
+  if [[ -z "$PAGES" ]]; then
+    echo "Oop! There are no assemblies in this PR, run a full build instead..."
+  else
+    for PAGE in $PAGES
+      do asciibinder build --page=$PAGE
+    done
+  fi
 }
 
 function delete_build {
