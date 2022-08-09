@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#version 0.5
+#version 0.6
 
 set -e
 
@@ -37,10 +37,14 @@ function full_build {
 }
 
 function refresh_build {
-  for PAGE in $PAGES
-    do asciibinder build --page=$PAGE; echo "Running rsync for $PAGE..."; rsync_build; echo "...rsync run complete!"
-    xdg-open >/dev/null 2>&1 http://$FILE_SERVER/$USER/$CURRENT_BRANCH/$PAGE.html 
-  done
+  if [[ -z "$PAGES" ]]; then
+    echo "Oop! There are no assemblies in this PR, run a full build instead..."
+  else
+    for PAGE in $PAGES
+      do asciibinder build --page=$PAGE; echo "Running rsync for $PAGE..."; rsync_build; echo "...rsync run complete!"
+      xdg-open >/dev/null 2>&1 http://$FILE_SERVER/$USER/$CURRENT_BRANCH/$PAGE.html 
+    done
+  fi
 }
 
 function rsync_build {
@@ -48,11 +52,14 @@ function rsync_build {
 }
 
 function build_rsync_silent {
-  for PAGE in $PAGES
-    do asciibinder build --page=$PAGE; echo "Running rsync for $PAGE..."
-  done
-
-  rsync_build
+  if [[ -z "$PAGES" ]]; then
+    echo "Oop! There are no assemblies in this PR, run a full build instead..."
+  else
+    for PAGE in $PAGES
+      do asciibinder clean; asciibinder build --page=$PAGE; echo "Running rsync for $PAGE..."
+    done
+    rsync_build
+  fi
 
   echo "...rsync run complete!"
 }
@@ -63,10 +70,14 @@ function local_full_build {
 }
 
 function local_refresh_build {
-  for PAGE in $PAGES
-    do asciibinder build --page=$PAGE
-    xdg-open >/dev/null 2>&1 $REPO_PATH/_preview/$DISTRO/$CURRENT_BRANCH/$PAGE.html
-  done
+  if [[ -z "$PAGES" ]]; then
+    echo "Oop! There are no assemblies in this PR, run a full build instead..."
+  else
+    for PAGE in $PAGES
+      do asciibinder build --page=$PAGE
+      xdg-open >/dev/null 2>&1 $REPO_PATH/_preview/$DISTRO/$CURRENT_BRANCH/$PAGE.html
+    done
+  fi
 }
 
 function local_refresh_silent {
