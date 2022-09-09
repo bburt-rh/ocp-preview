@@ -2,11 +2,15 @@
 
 Script to build and deploy openshift docs to a file server.
 
-To install: 
+Prerequisites: 
+
+* Request access to a local Red Hat file share server, for example, `file.emea.redhat.com`, and configure passwordless SSH access to the server.
+
+To install the script: 
 
 * Copy `ocp-preview` script to `/usr/local/bin`
 * `chmod a+x /usr/local/bin/ocp-preview`
-* Create a config file: `vi ~/.ocp-preview` and update with your config details, for example:
+* Create a config file: `~/.ocp-preview` and update with your file server config details, for example:
 
 ```
 [user]
