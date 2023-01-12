@@ -1,12 +1,18 @@
 # ocp-preview
 
-Script to build and deploy openshift docs to a file server.
+This is a script to build and deploy OpenShift docs using `asciibinder`. 
 
-Prerequisites: 
+Using one of the flags, you can either build locally or build locally and then copy the full build to a Red Hat file share server for remote access.
 
-* Request access to a local Red Hat file share server, for example, `file.emea.redhat.com`, and configure passwordless SSH access to the server.
+The script must be run from within your local `openshift-docs` directory, but the script itself should be located outside of this directory.
 
-To install the script: 
+. Prerequisites
+
+* You have a installed `asciibinder`.
+* You have set up your local `openshift-docs` repo.
+* For copying a build to a Red Hat file share server, you must request access from Red Hat IT. You will then be provided access to the server -- for example `file.emea.redhat.com`. Once you have access, configure passwordless SSH access to the server.
+
+. Installation 
 
 * Copy `ocp-preview` script to `/usr/local/bin`
 * `chmod a+x /usr/local/bin/ocp-preview`
@@ -21,11 +27,11 @@ To install the script:
     name = /home/aireilly/openshift-docs
 ```
 
-Using the ocp-preview script:
+Using the `ocp-preview` script:
 
 ```
 Usage: ocp-preview [OPTION] [DISTRO]
-Usage: [DISTRO] is optional, build default is openshift-enterprise. Specify 'all' to build all distros.
+Usage: [DISTRO] is optional, build default is `openshift-enterprise`. Specify `all` to build all distros.
 -b, --build
                does a full clean build and rsync. Use this option if your PR does not update an assembly.
 -r, --refresh
