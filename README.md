@@ -2,7 +2,7 @@
 
 This is a script to build and deploy OpenShift docs using `asciibinder`. 
 
-Using one of the flags, you can either build locally or build locally and then copy the full build to a Red Hat file share server for remote access.
+Using one of the flags, you can either build only locally, or you can build locally and then autoomatically copy the files in the full build to a Red Hat file share server for remote access.
 
 The script must be run from within your local `openshift-docs` directory, but the script itself should be located outside of this directory.
 
