@@ -27,7 +27,7 @@ The script must be run from within your local `openshift-docs` directory, but th
     name = /home/aireilly/openshift-docs
 ```
 
-Using the `ocp-preview` script:
+## Usage
 
 ```
 Usage: ocp-preview [OPTION] [DISTRO]
