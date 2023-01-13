@@ -6,13 +6,13 @@ Using one of the flags, you can either build locally or build locally and then c
 
 The script must be run from within your local `openshift-docs` directory, but the script itself should be located outside of this directory.
 
-. Prerequisites
+## Prerequisites
 
 * You have a installed `asciibinder`.
 * You have set up your local `openshift-docs` repo.
 * For copying a build to a Red Hat file share server, you must request access from Red Hat IT. You will then be provided access to the server -- for example `file.emea.redhat.com`. Once you have access, configure passwordless SSH access to the server.
 
-. Installation 
+## Installation 
 
 * Copy `ocp-preview` script to `/usr/local/bin`
 * `chmod a+x /usr/local/bin/ocp-preview`
